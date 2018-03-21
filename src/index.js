@@ -71,12 +71,14 @@ function commentCodeInsideBlocks (sourceByLine, blocks) {
     currentBlock = blocks[i]
 
     if (currentBlock && currentBlock.type === 'begin') {
+      sourceByLineTransformed[i] = commentLine(sourceByLine[i])
       action = 'commentLine'
       i += 1
       continue
     }
 
     if (currentBlock && currentBlock.type === 'end') {
+      sourceByLineTransformed[i] = commentLine(sourceByLine[i])
       action = ''
       i += 1
       continue
@@ -93,7 +95,7 @@ function commentCodeInsideBlocks (sourceByLine, blocks) {
 }
 
 function commentLine (line) {
-  return `// ${line}`
+  return ''
 }
 
 module.exports = function (source) {
