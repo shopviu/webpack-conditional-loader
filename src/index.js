@@ -1,28 +1,37 @@
 /* eslint-disable no-eval */
-const os = require('os');
+const os = require('os')
+const startBlockJS = /\/\/ #if .*/
+const endBlockJS = /\/\/ #endif$/
+const startBlockHtml = /<!-- #if .*-->/
+const endBlockHtml = /<!-- #endif -->$/
 
 function getPredicate (line) {
+  if (startBlockHtml.test(line)) {
+    let predicateStartIndex = line.indexOf('#if') + 4
+    let predecateEndIndex = line.indexOf(' -->')
+    return line.substring(predicateStartIndex, predecateEndIndex)
+  }
   return /\/\/ #if (.*)/.exec(line)[1]
 }
 
 function searchBlocks (sourceByLine) {
   const blocks = []
   let current = 0
-  const startBlock = /\/\/ #if .*/
-  const endBlock = /\/\/ #endif$/
 
   while (current < sourceByLine.length) {
-    if (startBlock.test(sourceByLine[current])) {
+    if (startBlockJS.test(sourceByLine[current]) || startBlockHtml.test(sourceByLine[current])) {
+      let currentLine = sourceByLine[current]
+
       blocks[current] = {
         type: 'begin',
-        predicate: getPredicate(sourceByLine[current])
+        predicate: getPredicate(currentLine)
       }
 
       current += 1
       continue
     }
 
-    if (endBlock.test(sourceByLine[current])) {
+    if (endBlockJS.test(sourceByLine[current]) || endBlockHtml.test(sourceByLine[current])) {
       blocks[current] = {
         type: 'end'
       }
